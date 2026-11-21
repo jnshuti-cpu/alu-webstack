@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
-# Displays information about subdomains of a domain
 # shellcheck disable=SC2086
+# Displays information about subdomains of a given domain
 
-display_info() {
+display_info () {
     local domain="$1"
     local sub="$2"
-    dig "$sub.$domain" | grep -A1 'ANSWER SECTION:' | tail -n1 | awk -v s="$sub" '{print "The subdomain " s " is a " $4 " record and points to " $5}'
+
+    dig "$sub.$domain" | grep -A1 'ANSWER SECTION:' | tail -n1 | \
+        awk -v sub_domain="$sub" '{print "The subdomain " sub_domain " is a " $4 " record and points to " $5}'
 }
 
-if [ "$#" -eq 1 ]; then
-    for s in www lb-01 web-01 web-02; do
-        display_info "$1" "$s"
-    done
-else
+if [ "$#" -eq 1 ]
+then
+    display_info "$1" "www"
+    display_info "$1" "lb-01"
+    display_info "$1" "web-01"
+    display_info "$1" "web-02"
+elif [ "$#" -ge 2 ]
+then
     display_info "$1" "$2"
 fi
